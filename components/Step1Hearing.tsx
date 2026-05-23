@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Category, Proposal } from "@/types";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const CATEGORIES: Category[] = [
