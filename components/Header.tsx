@@ -16,7 +16,7 @@ export default function Header({ onHistoryClick }: Props) {
         <span className="font-semibold text-gray-900 text-sm">AI Prompt Generator</span>
       </div>
       <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-500">エージェントアプリの活用法作成アシスタント</span>
+        <span className="text-sm text-gray-500">店舗経営の相方 — 集客・採用・数字管理のAIアシスタント</span>
         <button
           onClick={onHistoryClick}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"

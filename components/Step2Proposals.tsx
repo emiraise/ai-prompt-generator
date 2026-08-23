@@ -147,6 +147,15 @@ export default function Step2Proposals({ category, jobDescription, proposals: in
             {/* 説明 */}
             <p className="text-xs text-gray-500 leading-relaxed mb-3">{proposal.description}</p>
 
+            {/* 期待効果 */}
+            {proposal.effect && (
+              <div className="mb-3">
+                <span className="inline-flex items-center gap-1 bg-green-50 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-100">
+                  ⏱ {proposal.effect}
+                </span>
+              </div>
+            )}
+
             {/* 選択矢印 */}
             <div className="flex items-center justify-end">
               <span className="text-xs text-gray-300 group-hover:text-green-500 transition-colors flex items-center gap-1">

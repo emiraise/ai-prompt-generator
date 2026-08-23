@@ -9,6 +9,7 @@ export type Proposal = {
   title: string;
   description: string;
   hypothesis: string;   // 分析仮説
+  effect?: string;      // 期待効果（例：週2時間削減）
   difficulty: 1 | 2 | 3; // 1=初級 2=中級 3=上級
 };
 
