@@ -246,6 +246,7 @@ export default function Step1Hearing({ onGenerate }: Props) {
             <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
               <textarea
                 value={jobDescription}
+                maxLength={2000}
                 onChange={(e) => setJobDescription(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
                 placeholder="例：店舗集客のためにSNS運用を担当しています。毎朝10件の投稿案を考えるのが大変で、さらに各投稿のインサイトデータをExcelに転記して週次レポートを作成する作業に毎週3時間かかっています。"

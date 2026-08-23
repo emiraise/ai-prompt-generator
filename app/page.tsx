@@ -44,7 +44,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header onHistoryClick={() => setHistoryOpen(true)} />
+      <Header onHistoryClick={() => setHistoryOpen(true)} onLogoClick={() => setState({ step: 1 })} />
       <StepIndicator currentStep={state.step} />
 
       {state.step === 1 && <Step1Hearing onGenerate={handleProposalsGenerated} />}
