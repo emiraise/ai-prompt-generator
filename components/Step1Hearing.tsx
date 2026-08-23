@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Category, Proposal } from "@/types";
-import { Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import LoadingScreen from "@/components/LoadingScreen";
 
 const CATEGORIES: Category[] = [
@@ -145,6 +145,7 @@ export default function Step1Hearing({ onGenerate }: Props) {
   const [jobDescription,   setJobDescription]   = useState("");
   const [loading,          setLoading]           = useState(false);
   const [error,            setError]             = useState("");
+  const [showAdvanced,     setShowAdvanced]      = useState(false);
 
   const handleGenerate = async (overrideText?: string) => {
     const text = (overrideText ?? jobDescription).trim();
@@ -180,100 +181,119 @@ export default function Step1Hearing({ onGenerate }: Props) {
   return (
     <div className="max-w-3xl mx-auto px-4 pb-12">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">お店の悩みを教えてください</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">お店の悩みを選んでください</h1>
         <p className="text-sm text-gray-500">
-          集客・採用・数字管理・日々のルーティンなど、「面倒だな」「どうすれば…」と感じていることを具体的に入力してください。
+          当てはまるカードを<span className="font-semibold text-green-700">タップするだけ</span>で、AIが解決アイデアを提案します。
+          <br className="hidden sm:block" />
+          文章を書く必要はありません。
         </p>
         <p className="text-xs text-gray-400 mt-1">※入力内容は改善のために使用されます。個人情報や機密情報は入力しないでください。</p>
       </div>
 
-      {/* カテゴリ選択 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setSelectedCategory(cat)}
-            className={`p-3 rounded-xl border-2 text-left transition-all ${
-              selectedCategory.id === cat.id
-                ? "border-green-600 bg-green-50"
-                : "border-gray-200 bg-white hover:border-gray-300"
-            }`}
-          >
-            <div className="flex items-start gap-2">
-              <span className="text-xl">{cat.icon}</span>
-              <div>
-                <div className={`text-xs font-semibold leading-tight ${selectedCategory.id === cat.id ? "text-green-700" : "text-gray-800"}`}>
-                  {cat.label}
-                </div>
-                <div className="text-xs text-gray-500 mt-0.5 leading-tight">{cat.description}</div>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
+      {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
-      {/* テキストエリア */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
-        <textarea
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
-          placeholder="例：店舗集客のためにSNS運用を担当しています。毎朝10件の投稿案を考えるのが大変で、さらに各投稿のインサイトデータをExcelに転記して週次レポートを作成する作業に毎週3時間かかっています。"
-          className="w-full h-28 text-sm text-gray-700 placeholder-gray-400 resize-none outline-none"
-        />
-      </div>
-
-      {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
-
-      {/* CTA ボタン */}
-      <div className="relative flex flex-col items-center mb-2">
-        <div className="mb-3 bg-green-50 border border-green-200 text-green-800 text-xs font-medium px-4 py-2 rounded-full shadow-sm">
-          ✨ 面倒な作業、AIに任せてみませんか？
-        </div>
-        <div className="relative w-full">
-          <button
-            onClick={() => handleGenerate()}
-            className="cta-bounce cta-pulse relative w-full py-4 bg-green-600 text-white rounded-xl font-bold text-base hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-200"
-          >
-            <Sparkles size={18} />
-            アイデアを生成する
-            <span className="ml-1 text-green-200 text-sm font-normal">→</span>
-          </button>
-        </div>
-        <p className="mt-2 text-xs text-gray-400">数秒で悩みを解決するアイデアが届きます</p>
-      </div>
-
-      {/* 入力例（グループ別） */}
-      <div className="mt-8 space-y-6">
-        <p className="text-sm font-semibold text-gray-700 flex items-center gap-1">
-          💡 <span>入力例（クリックで即アイデア生成）</span>
-        </p>
-
+      {/* 悩みカード（メインUI） */}
+      <div className="space-y-7">
         {EXAMPLE_GROUPS.map((group) => (
           <div key={group.label}>
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-base">{group.icon}</span>
-              <span className="text-xs font-bold text-gray-700">{group.label}</span>
+              <span className="text-lg">{group.icon}</span>
+              <span className="text-sm font-bold text-gray-800">{group.label}</span>
               <span className="text-xs text-gray-400">— {group.note}</span>
               <div className="flex-1 h-px bg-gray-100 ml-1" />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {group.items.map((ex) => (
                 <button
                   key={ex.label}
                   onClick={() => handleGenerate(ex.text)}
-                  className="p-3 bg-white rounded-xl border border-gray-200 text-left hover:border-green-300 hover:shadow-sm transition-all"
+                  className="group p-4 bg-white rounded-xl border border-gray-200 text-left hover:border-green-400 hover:shadow-md active:bg-green-50 transition-all"
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-base">{ex.icon}</span>
-                    <span className="text-xs font-semibold text-gray-700">{ex.label}</span>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-lg">{ex.icon}</span>
+                    <span className="text-sm font-bold text-gray-800 group-hover:text-green-700 transition-colors">{ex.label}</span>
                   </div>
-                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-3">{ex.text}</p>
+                  <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 sm:line-clamp-3">{ex.text}</p>
+                  <div className="mt-2 text-[11px] font-semibold text-green-600 flex items-center gap-1">
+                    <Sparkles size={11} />
+                    タップしてアイデアを見る
+                  </div>
                 </button>
               ))}
             </div>
           </div>
         ))}
+      </div>
+
+      {/* 自分の言葉で入力する（上級者向け） */}
+      <div className="mt-10">
+        <button
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="w-full py-3.5 border-2 border-gray-200 text-gray-600 rounded-xl font-bold text-sm hover:border-green-300 hover:text-green-700 transition-all flex items-center justify-center gap-2"
+        >
+          💬 自分の言葉で入力する
+          <span className="text-xs text-gray-400 font-normal">（慣れてきた方向け）</span>
+          {showAdvanced ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+        </button>
+
+        {showAdvanced && (
+          <div className="mt-4">
+            <p className="text-xs text-gray-500 mb-4 text-center">
+              日々のルーティンワークや「面倒だな」と感じる作業を、自分の言葉で具体的に入力してください。
+            </p>
+
+            {/* テキストエリア */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+              <textarea
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleGenerate(); } }}
+                placeholder="例：店舗集客のためにSNS運用を担当しています。毎朝10件の投稿案を考えるのが大変で、さらに各投稿のインサイトデータをExcelに転記して週次レポートを作成する作業に毎週3時間かかっています。"
+                className="w-full h-28 text-sm text-gray-700 placeholder-gray-400 resize-none outline-none"
+              />
+            </div>
+
+            {/* カテゴリ選択（任意） */}
+            <p className="text-xs font-semibold text-gray-600 mb-2">
+              使いたいAIツールを選ぶ
+              <span className="text-gray-400 font-normal">（わからなければそのままでOK）</span>
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`p-3 rounded-xl border-2 text-left transition-all ${
+                    selectedCategory.id === cat.id
+                      ? "border-green-600 bg-green-50"
+                      : "border-gray-200 bg-white hover:border-gray-300"
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    <span className="text-xl">{cat.icon}</span>
+                    <div>
+                      <div className={`text-xs font-semibold leading-tight ${selectedCategory.id === cat.id ? "text-green-700" : "text-gray-800"}`}>
+                        {cat.label}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5 leading-tight">{cat.description}</div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* CTA ボタン */}
+            <button
+              onClick={() => handleGenerate()}
+              className="w-full py-4 bg-green-600 text-white rounded-xl font-bold text-base hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-200"
+            >
+              <Sparkles size={18} />
+              アイデアを生成する
+              <span className="ml-1 text-green-200 text-sm font-normal">→</span>
+            </button>
+            <p className="mt-2 text-xs text-gray-400 text-center">数秒で悩みを解決するアイデアが届きます</p>
+          </div>
+        )}
       </div>
     </div>
   );
